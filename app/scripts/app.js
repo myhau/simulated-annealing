@@ -1,11 +1,13 @@
 
-var React = window.React = require('react'),
-    Timer = require("./ui/Timer"),
-    mountNode = document.getElementById("app");
+import React from "react";
+import Timer from "./ui/Timer";
+import I from "immutable";
 
-var TodoList = React.createClass({
+let mountNode = document.getElementById("app");
+
+let TodoList = React.createClass({
   render: function() {
-    var createItem = function(itemText) {
+    let createItem = function(itemText) {
       return <li>{itemText}</li>;
     };
     return <ul>{this.props.items.map(createItem)}</ul>;
@@ -13,10 +15,13 @@ var TodoList = React.createClass({
 });
 var TodoApp = React.createClass({
   getInitialState: function() {
-    return {items: [], text: ''};
+    return {
+        items: [], text: '',
+        others: Immutable.Map({})
+    };
   },
   onChange: function(e) {
-    this.setState({text: e.target.value});
+    this.setState({text: e.target.value, others: this.state.others.set(e.target.value, 1)});
   },
   handleSubmit: function(e) {
     e.preventDefault();
@@ -27,7 +32,7 @@ var TodoApp = React.createClass({
   render: function() {
     return (
       <div>
-        <h3>TODO</h3>
+        <h3></h3>
         <TodoList items={this.state.items} />
         <form onSubmit={this.handleSubmit}>
           <input onChange={this.onChange} value={this.state.text} />
