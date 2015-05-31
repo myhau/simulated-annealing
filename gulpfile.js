@@ -19,7 +19,7 @@ var source = require('vinyl-source-stream'),
 
 var browserSync = require('browser-sync');
 var reload = browserSync.reload;
-
+//
 // Styles
 gulp.task('styles', ['sass'  ]);
 
@@ -51,7 +51,7 @@ var bundler = watchify(browserify({
     cache: {},
     packageCache: {},
     fullPaths: true
-}).transform(babelify));
+}));
 
 bundler.on('update', rebundle);
 bundler.on('log', $.util.log);

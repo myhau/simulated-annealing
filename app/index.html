@@ -11,26 +11,21 @@
         <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
 
         <link rel="stylesheet" href="styles/main.css">
-        
+
         <!-- build:js scripts/vendor/modernizr.js -->
         <script src="bower_components/modernizr/modernizr.js"></script>
         <!-- endbuild -->
-        
+
     </head>
     <body>
         <!--[if lt IE 10]>
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
 
-        
+
         <div class="container">
             <div class="header">
-                <ul class="nav nav-pills pull-right">
-                    <li class="active"><a href="#">Home</a></li>
-                    <li><a href="#">About</a></li>
-                    <li><a href="#">Contact</a></li>
-                </ul>
-                <h3 class="text-muted">simulated annealing</h3>
+                <h3 class="text-muted">Simulated annealing</h3>
             </div>
 
             <div class="jumbotron" id="app">
@@ -39,6 +34,53 @@
                 <p><a class="btn btn-lg btn-success" href="#">Splendid!</a></p>
             </div>
 
+            <div id="sa-data">
+                <span id="sa-iter"></span>
+                <span id="sa-evals"></span>
+                <span id="sa-temp"></span>
+                <span id="sa-pos"></span>
+                <span id="sa-energy"></span>
+                <span id="sa-best_energy"></span>
+                <span id="sa-pos-best"></span>
+            </div>
+
+            <form id="sa-params" role="form">
+            	<legend>Simulated annealing parameters</legend>
+
+            	<div class="form-group">
+            		<label for="temp_init">Initial temperature</label>
+            		<input type="number" step="0.01" class="form-control" name="temp_init" id="temp_init" value="1000">
+            	</div>
+                <div class="form-group">
+                    <label for="temp_min">Minimal temperature</label>
+                    <input type="number" step="0.001" class="form-control" name="temp_min" id="temp_min" value="0.001">
+                </div>
+                <div class="form-group">
+                    <label for="damp_factor">Damp factor</label>
+                    <input type="number" step="0.01" class="form-control" name="damp_factor" id="damp_factor" value="1.02">
+                </div>
+                <div class="form-group">
+                    <label for="k">Boltzman constant k</label>
+                    <input type="number" step="0.01" class="form-control" name="k" id="k" value="1">
+                </div>
+                <div class="form-group">
+                    <label for="iters_for_each_t">Each try iterations</label>
+                    <input type="number" step="1" class="form-control" name="iters_for_each_t" id="iters_for_each_t" value="200">
+                </div>
+                <div class="form-group">
+                    <label for="n_tries">Each try iterations</label>
+                    <input type="number" step="1" class="form-control" name="n_tries" id="n_tries" value="200">
+                </div>
+            	<button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+
+            <form id="sa-main-fader-form" >
+                <div class="form-group">
+                <label for="sa-main-fader">Time machine:</label>
+                <input type=range min="1" max="100" value="0" id="sa-main-fader" />
+                </div>
+            </form>
+
             <div id="content" class="row marketing">
                 <div class="col-lg-6">
                     <h4>HTML5 Boilerplate</h4>
@@ -46,14 +88,14 @@
 
                     <h4>Sass with Compass</h4>
                     <p>Compass is an open-source CSS Authoring Framework that uses Sass.</p>
-                    
+
 
                     <h4>Bootstrap</h4>
                     <p>Sleek, intuitive, and powerful mobile first front-end framework for faster and easier web development.</p>
 
                     <h4>Modernizr</h4>
                     <p>Modernizr is an open-source JavaScript library that helps you build the next generation of HTML5 and CSS3-powered websites.</p>
-                    
+
                 </div>
             </div>
 
@@ -62,7 +104,7 @@
             </div>
 
         </div>
-        
+
 
         <!-- build:js scripts/vendor.js -->
         <!-- bower:js -->

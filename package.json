@@ -3,8 +3,11 @@
   "version": "0.0.0",
   "dependencies": {
     "babel-runtime": "^5.4.7",
+    "body-parser": "^1.12.4",
     "d3": "^3.5.5",
+    "express": "^4.12.4",
     "immutable": "^3.7.3",
+    "radioactive": "^1.6.0",
     "rx": "^2.5.2",
     "rx-dom": "^5.0.4",
     "transducers-js": "^0.4.174"
@@ -53,9 +56,10 @@
     "transform": [
       "browserify-shim",
       [
-        "reactify",
+        "babelify",
         {
-          "es6": true
+          "optional": "runtime",
+          "sourceMap": "inline"
         }
       ]
     ]
