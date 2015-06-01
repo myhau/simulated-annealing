@@ -16,6 +16,9 @@
         <script src="bower_components/modernizr/modernizr.js"></script>
         <!-- endbuild -->
 
+        <script src="bower_components/sigma/sigma.min.js"/>
+
+
     </head>
     <body>
         <!--[if lt IE 10]>
@@ -23,56 +26,109 @@
         <![endif]-->
 
 
-        <div class="container">
+        <div class="container-fluid">
             <div class="header">
                 <h3 class="text-muted">Simulated annealing</h3>
             </div>
 
-            <div class="jumbotron" id="app">
-                <h1>'Allo, 'Allo!</h1>
-                <p class="lead">Always a pleasure scaffolding your apps.</p>
-                <p><a class="btn btn-lg btn-success" href="#">Splendid!</a></p>
-            </div>
+            <div class="row">
+            	<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+                    <h3>Outputs</h3>
+                    <div id="sa-data">
+                        <table class="table table-bordered table-striped">
+                            <colgroup>
+                                <col class="col-xs-1">
+                                <col class="col-xs-7">
+                            </colgroup>
+                            <thead>
+                            <tr>
+                                <th>Parameter</th>
+                                <th>Value</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <th scope="row">
+                                    Iteration no.
+                                </th>
+                                <td><span id="sa-iter"></span></td>
+                            </tr>
+                            <tr>
+                                <th scope="row">
+                                    How many times were evaluated
+                                </th>
+                                <td><span id="sa-evals"></span></td>
+                            </tr>
+                            <tr id="sa-temp-color">
+                                <th scope="row">
+                                    Current temperature
+                                </th>
+                                <td><span id="sa-temp"></span></td>
+                            </tr>
+                            <tr>
+                                <th scope="row">
+                                    Now solution
+                                </th>
+                                <td><span id="sa-pos"></span></td>
+                            </tr>
+                            <tr>
+                                <th scope="row">
+                                    Cost
+                                </th>
+                                <td><span id="sa-energy"></span></td>
+                            </tr>
+                            <tr class="success">
+                                <th scope="row">
+                                    Lowest cost
+                                </th>
+                                <td><span id="sa-best_energy"></span></td>
+                            </tr>
+                            <tr class="success">
+                                <th scope="row">
+                                    Best solution
+                                </th>
+                                <td><span id="sa-best_pos"></span></td>
+                            </tr>
+                            </tbody>
+                        </table>
 
-            <div id="sa-data">
-                <span id="sa-iter"></span>
-                <span id="sa-evals"></span>
-                <span id="sa-temp"></span>
-                <span id="sa-pos"></span>
-                <span id="sa-energy"></span>
-                <span id="sa-best_energy"></span>
-                <span id="sa-pos-best"></span>
-            </div>
 
-            <form id="sa-params" role="form">
-            	<legend>Simulated annealing parameters</legend>
-
-            	<div class="form-group">
-            		<label for="temp_init">Initial temperature</label>
-            		<input type="number" step="0.01" class="form-control" name="temp_init" id="temp_init" value="1000">
+                    </div>
             	</div>
-                <div class="form-group">
-                    <label for="temp_min">Minimal temperature</label>
-                    <input type="number" step="0.001" class="form-control" name="temp_min" id="temp_min" value="0.001">
+                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                    <div style="width:500px; height:600px" id="graph-container"></div>
                 </div>
-                <div class="form-group">
-                    <label for="damp_factor">Damp factor</label>
-                    <input type="number" step="0.01" class="form-control" name="damp_factor" id="damp_factor" value="1.02">
+                <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
+                    <h3>Parameters</h3>
+                    <form id="sa-params">
+                        <div class="form-group">
+                            <label for="temp_init">Initial temperature</label>
+                            <input type="number" step="0.01" class="form-control" name="temp_init" id="temp_init" value="1000">
+                        </div>
+                        <div class="form-group">
+                            <label for="temp_min">Minimal temperature</label>
+                            <input type="number" step="0.001" class="form-control" name="temp_min" id="temp_min" value="0.001">
+                        </div>
+                        <div class="form-group">
+                            <label for="damp_factor">Damp factor</label>
+                            <input type="number" step="0.01" class="form-control" name="damp_factor" id="damp_factor" value="1.02">
+                        </div>
+                        <div class="form-group">
+                            <label for="k">Boltzman constant k</label>
+                            <input type="number" step="0.01" class="form-control" name="k" id="k" value="1">
+                        </div>
+                        <div class="form-group">
+                            <label for="iters_for_each_t">Each try iterations</label>
+                            <input type="number" step="1" class="form-control" name="iters_for_each_t" id="iters_for_each_t" value="200">
+                        </div>
+                        <div class="form-group">
+                            <label for="n_tries">Each try iterations</label>
+                            <input type="number" step="1" class="form-control" name="n_tries" id="n_tries" value="200">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
                 </div>
-                <div class="form-group">
-                    <label for="k">Boltzman constant k</label>
-                    <input type="number" step="0.01" class="form-control" name="k" id="k" value="1">
-                </div>
-                <div class="form-group">
-                    <label for="iters_for_each_t">Each try iterations</label>
-                    <input type="number" step="1" class="form-control" name="iters_for_each_t" id="iters_for_each_t" value="200">
-                </div>
-                <div class="form-group">
-                    <label for="n_tries">Each try iterations</label>
-                    <input type="number" step="1" class="form-control" name="n_tries" id="n_tries" value="200">
-                </div>
-            	<button type="submit" class="btn btn-primary">Submit</button>
-            </form>
+            </div>
 
             <form id="sa-main-fader-form" >
                 <div class="form-group">
@@ -81,26 +137,8 @@
                 </div>
             </form>
 
-            <div id="content" class="row marketing">
-                <div class="col-lg-6">
-                    <h4>HTML5 Boilerplate</h4>
-                    <p>HTML5 Boilerplate is a professional front-end template for building fast, robust, and adaptable web apps or sites.</p>
-
-                    <h4>Sass with Compass</h4>
-                    <p>Compass is an open-source CSS Authoring Framework that uses Sass.</p>
-
-
-                    <h4>Bootstrap</h4>
-                    <p>Sleek, intuitive, and powerful mobile first front-end framework for faster and easier web development.</p>
-
-                    <h4>Modernizr</h4>
-                    <p>Modernizr is an open-source JavaScript library that helps you build the next generation of HTML5 and CSS3-powered websites.</p>
-
-                </div>
-            </div>
-
             <div class="footer">
-                <p>♥ from the Yeoman team</p>
+                <p>Author: <a href="http://michalfudala.com">Michal Fudala</a></p>
             </div>
 
         </div>

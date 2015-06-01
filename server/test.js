@@ -41,7 +41,7 @@ function fromJsonData(json) {
         })
         .map(line => {
             if(line.startsWith("SOLUTION"))
-                return {sol: line.split(" ")[1]}
+                return {sol: JSON.parse(line.split(" ")[1])}
                 return iter_line_to_json(line.trim().split(/ +/))
         })
         .reduce((acc, line) => {
