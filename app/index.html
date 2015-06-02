@@ -16,7 +16,7 @@
         <script src="bower_components/modernizr/modernizr.js"></script>
         <!-- endbuild -->
 
-        <script src="bower_components/sigma/sigma.min.js"/>
+        <script src="bower_components/sigma/sigma.min.js"> </script>
 
 
     </head>
@@ -51,91 +51,109 @@
                                 <th scope="row">
                                     Iteration no.
                                 </th>
-                                <td><span id="sa-iter"></span></td>
+                                <td><div id="sa-iter"></div></td>
                             </tr>
                             <tr>
                                 <th scope="row">
-                                    How many times were evaluated
+                                    Evaluated count
                                 </th>
-                                <td><span id="sa-evals"></span></td>
+                                <td><div id="sa-evals" ></div></td>
                             </tr>
                             <tr id="sa-temp-color">
                                 <th scope="row">
                                     Current temperature
                                 </th>
-                                <td><span id="sa-temp"></span></td>
+                                <td><div id="sa-temp"></div></td>
                             </tr>
                             <tr>
                                 <th scope="row">
                                     Now solution
                                 </th>
-                                <td><span id="sa-pos"></span></td>
+                                <td><div id="sa-pos" ></div></td>
                             </tr>
                             <tr>
                                 <th scope="row">
                                     Cost
                                 </th>
-                                <td><span id="sa-energy"></span></td>
+                                <td><div id="sa-energy"></div></td>
                             </tr>
                             <tr class="success">
                                 <th scope="row">
                                     Lowest cost
                                 </th>
-                                <td><span id="sa-best_energy"></span></td>
+                                <td><div id="sa-best_energy"></div></td>
                             </tr>
                             <tr class="success">
                                 <th scope="row">
                                     Best solution
                                 </th>
-                                <td><span id="sa-best_pos"></span></td>
+                                <td><div id="sa-best_pos"></div></td>
                             </tr>
                             </tbody>
                         </table>
-
+                        <form id="sa-points">
+                            <div class="form-group">
+                                <label for="x">X</label>
+                                <input type="number" step="0.0001" class="form-control input-sm" name="x" id="point_x" value="5">
+                            </div>
+                            <div class="form-group">
+                                <label for="y">Y</label>
+                                <input type="number" step="0.0001" class="form-control input-sm" name="y" id="point_y" value="5">
+                            </div>
+                            <button type="submit" class="btn btn-primary" id="points-random">Add 10 random</button>
+                            <button type="submit" class="btn btn-primary" id="points-add">Add</button>
+                        </form>
 
                     </div>
             	</div>
                 <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-                    <div style="width:500px; height:600px" id="graph-container"></div>
+                    <div style="width:550px; height:650px" id="graph-container"></div>
                 </div>
-                <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
+                <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
                     <h3>Parameters</h3>
                     <form id="sa-params">
                         <div class="form-group">
                             <label for="temp_init">Initial temperature</label>
-                            <input type="number" step="0.01" class="form-control" name="temp_init" id="temp_init" value="1000">
+                            <input type="number" step="0.00001" class="form-control input-sm" name="temp_init" id="temp_init" value="1000">
                         </div>
                         <div class="form-group">
                             <label for="temp_min">Minimal temperature</label>
-                            <input type="number" step="0.001" class="form-control" name="temp_min" id="temp_min" value="0.001">
+                            <input type="number" step="0.00001" class="form-control input-sm" name="temp_min" id="temp_min" value="0.001">
                         </div>
                         <div class="form-group">
                             <label for="damp_factor">Damp factor</label>
-                            <input type="number" step="0.01" class="form-control" name="damp_factor" id="damp_factor" value="1.02">
+                            <input type="number" step="0.00001" class="form-control input-sm" name="damp_factor" id="damp_factor" value="1.02">
                         </div>
                         <div class="form-group">
                             <label for="k">Boltzman constant k</label>
-                            <input type="number" step="0.01" class="form-control" name="k" id="k" value="1">
+                            <input type="number" step="0.00001" class="form-control input-sm" name="k" id="k" value="1">
                         </div>
                         <div class="form-group">
                             <label for="iters_for_each_t">Each try iterations</label>
-                            <input type="number" step="1" class="form-control" name="iters_for_each_t" id="iters_for_each_t" value="200">
+                            <input type="number" min="1" step="1" class="form-control input-sm" name="iters_for_each_t" id="iters_for_each_t" value="200">
                         </div>
                         <div class="form-group">
                             <label for="n_tries">Each try iterations</label>
-                            <input type="number" step="1" class="form-control" name="n_tries" id="n_tries" value="200">
+                            <input type="number" min="1" step="1" class="form-control input-sm" name="n_tries" id="n_tries" value="200">
                         </div>
                         <button type="submit" class="btn btn-primary">Submit</button>
                     </form>
                 </div>
             </div>
 
-            <form id="sa-main-fader-form" >
-                <div class="form-group">
-                <label for="sa-main-fader">Time machine:</label>
-                <input type=range min="1" max="100" value="0" id="sa-main-fader" />
+            <div class="row">
+                <form id="sa-main-fader-form">
+                <div class="col-xs-10">
+                    <div class="form-group">
+                        <label for="sa-main-fader">Time machine:</label>
+                        <input type=range min="0" max="100" value="0" id="sa-main-fader" />
+                    </div>
                 </div>
-            </form>
+                <div class="col-xs-2">
+                    <button type="submit" class="btn btn-primary">Show best</button>
+                </div>
+                </form>
+            </div>
 
             <div class="footer">
                 <p>Author: <a href="http://michalfudala.com">Michal Fudala</a></p>

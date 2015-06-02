@@ -15,6 +15,11 @@ body {
     padding-bottom: 20px;
 }
 
+#sa-data div {
+    width: 150px; 
+    overflow: auto
+}
+
 /* Everything but the jumbotron gets side spacing for mobile first views */
 .header,
 .marketing,

@@ -41,9 +41,38 @@ function toSigmaCoords(e) {
     return {x, y};
 }
 
+const RANDOM_NODES = 15;
+
+function* randomArrayWithMaxAbs(x, y, count) {
+    for(let i = 0; count > i; i++) {
+        yield {x: x * (2 * Math.random() - 1), y: y * (2 * Math.random()  - 1)}
+    }
+}
+//
 let clickSource = 
-    fromEvent($("#graph-container canvas:last-child"), "click")
-        .map(e => (toSigmaCoords(e)))
+    Rx.Observable.merge(
+        fromEvent($("#points-add"), "click")
+            .map(e => {e.preventDefault(); return $("#sa-points").serializeArray()})
+            .map(ser => {
+                let resObj = {};
+                ser.forEach(el => {
+                    if(el.name == "y") resObj[el.name] = -1*parseFloat(el.value);
+                    else resObj[el.name] = parseFloat(el.value);
+                })
+                return resObj;
+            }),
+        fromEvent($("#points-random"), "click")
+            .map(e => {e.preventDefault(); return $("#sa-points").serializeArray()})
+            .flatMap(ser => {
+                let resObj = {};
+                ser.forEach(el => {
+                    if(el.name == "y") resObj[el.name] = -1*parseFloat(el.value);
+                    else resObj[el.name] = parseFloat(el.value);
+                })
+                return from(randomArrayWithMaxAbs(resObj.x, resObj.y, RANDOM_NODES))
+                return resObj;
+            }));
+
 
 let undoSource =
     fromEvent(window, "keydown") 
@@ -58,7 +87,7 @@ let pointsSource = Rx.Observable.merge(
             (type == "click") ? acc.concat(point) : acc.slice(0, -1)
         )
 pointsSource.subscribe(points => {
-    Render.renderOnlyPoints(points);
+    Render.renderOnlyPoints(points, tempColorInterpolation(1).hex());
 })
 
 let above2PointsSource = pointsSource.filter(points => points.length > 2);
@@ -96,12 +125,12 @@ saOutputSource.subscribe(data => {
 
 let faderSource =
     fromEvent($("#sa-main-fader"), "input")
-        .throttleFirst(30)
+        .throttleFirst(40)
         .map(e => $(e.target).val());
 
 
 let nowIterSource = saOutputSource.flatMapLatest(data => {
-    return faderSource.startWith(1).map(index => { return {iter : data.iters[index], sol: data.sol} })
+    return faderSource.startWith(0).map(index => { return {iter : data.iters[index], sol: data.sol} })
 });
 
 
@@ -120,5 +149,3 @@ Rx.Observable.combineLatest(nowIterSource, saParamsSource,
         $("#sa-temp-color").css("background-color",tempColor);
         $("#sa-best_pos").html(JSON.stringify(data.sol))
     });
-
-
