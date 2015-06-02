@@ -182,7 +182,7 @@ gulp.task('watch', ['html', 'fonts', 'bundle'], function() {
     gulp.watch('app/scripts/**/*.json', ['json']);
 
     // Watch .html files
-    gulp.watch('app/*.html', ['html']);
+    gulp.watch('app/*.html', ['html', reload]);
 
     gulp.watch(['app/styles/**/*.scss', 'app/styles/**/*.css'], ['styles', reload]);
 

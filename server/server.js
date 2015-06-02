@@ -8,19 +8,26 @@ let app = express();
 
 app.use(bodyParser.json());
 
-// var o = {
-//     temp_init: 1000,
-//     temp_min: 1,
-//     damp_factor: 1.02,
-//     k: 1,
-//     step_size:1,
-//     iters_for_each_t: 200,
-//     n_tries: 200,
-//     points: [{x: 10, y: 20}, {x: 20, y: 30}, {x:15, y:35}, {x:25, y:3}]
-// }
+let execObs = function (command) {
+    return Rx.Observable.create(function (observer) {
+        let process = exec(command, (err, stdout, stderr) => {
+            if(err !== null) observer.onError(err);
+            else {
+                observer.onNext([stdout, stderr]);
+                observer.onCompleted();
+            }
+        }); 
+        return function() {
+            
+            if(process) {
+                console.log("DISPOSED");
+                process.kill();
+            }
+        }
+    });
+};
 
-
-let execSource = Rx.Observable.fromNodeCallback(exec);
+let execSource = execObs;
 
 function iter_line_to_json(iter_line) {
     let res = {};
@@ -32,8 +39,11 @@ function iter_line_to_json(iter_line) {
 }
 
 function fromJsonData(json) {
+    json["step_size"] = 0; // non important, should have done it somewhere else...
+    json["n_tries"] = 0;
+
     let prepared = JSON.stringify(json).replace(/"/g,"\\\"");
-    let source = execSource(`./c/main "${prepared}"`);
+    let source = execSource(`./c/main "${prepared}"`).share();
     return source
         .flatMap(([lines, stderr]) => {
             if(stderr) return Rx.Observable.throwError(stderr);
@@ -61,8 +71,13 @@ app.use(function(req, res, next) {
 });
 
 app.post("/", (req, res) => {
-    console.log(req.body);
-    fromJsonData(req.body).subscribe(x => res.send(x), err=>res.sendStatus(400))
+    console.log("REQ!");
+    let sub = fromJsonData(req.body).subscribe(x => res.send(x), err=>res.sendStatus(400))
+    req.on("close", function() {
+        console.log("aSD");
+        sub.dispose();
+    });
+    
 })
 
 app.listen(8089)

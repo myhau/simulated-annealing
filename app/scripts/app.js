@@ -1,28 +1,20 @@
 "use strict";
 
-let Rx = require("rx-dom");
+let Rx = require("rx-dom"), 
+    Obs = Rx.Observable;
+
 let I = require("immutable");
-let $ = require("jquery");
 let chroma = require("chroma-js");
-
-let from = Rx.Observable.from,
-    fromEvent = Rx.Observable.fromEvent,
-    fromPromise = Rx.Observable.fromPromise;
-
+    
 let Render = require("./render.js");
 
-let sigmaCamera = Render.getSigma().camera;
-
-let serverName = "http://localhost:8089/";
-
-let paramNames =
-    ["temp_init", "temp_min", "damp_factor", "k", "iters_for_each", "n_tries"];
+let serverName = `http://${location.hostname}:8089/`;
 
 let tempColorInterpolation = chroma.scale(["#21AB6C","#60A744","#8E9E1D","#B99106","#DE7E24","#F9684A"]);
 
-
 function getSimulatedData(params) {
-    return fromPromise($.ajax({
+    console.log("ASD");
+    return Obs.fromPromise($.ajax({
         url: serverName,
         data: JSON.stringify(params),
         contentType: "application/json",
@@ -30,62 +22,62 @@ function getSimulatedData(params) {
         method: "POST",
         accepts: "json"
     }));
-    //return fromPromise(ajaxPromise);
 }
 
-function toSigmaCoords(e) {
-    let x1 = sigma.utils.getX(e) - e.target.offsetWidth / 2;
-    let y1 = sigma.utils.getY(e) - e.target.offsetHeight / 2;
-    let {x, y} = sigmaCamera.cameraPosition(x1, y1);
-
-    return {x, y};
-}
-
-const RANDOM_NODES = 15;
-
-function* randomArrayWithMaxAbs(x, y, count) {
+function* randomWithMaxAbs(x, y, count) {
     for(let i = 0; count > i; i++) {
         yield {x: x * (2 * Math.random() - 1), y: y * (2 * Math.random()  - 1)}
     }
 }
-//
-let clickSource = 
-    Rx.Observable.merge(
-        fromEvent($("#points-add"), "click")
-            .map(e => {e.preventDefault(); return $("#sa-points").serializeArray()})
-            .map(ser => {
-                let resObj = {};
-                ser.forEach(el => {
-                    if(el.name == "y") resObj[el.name] = -1*parseFloat(el.value);
-                    else resObj[el.name] = parseFloat(el.value);
-                })
-                return resObj;
-            }),
-        fromEvent($("#points-random"), "click")
-            .map(e => {e.preventDefault(); return $("#sa-points").serializeArray()})
-            .flatMap(ser => {
-                let resObj = {};
-                ser.forEach(el => {
-                    if(el.name == "y") resObj[el.name] = -1*parseFloat(el.value);
-                    else resObj[el.name] = parseFloat(el.value);
-                })
-                return from(randomArrayWithMaxAbs(resObj.x, resObj.y, RANDOM_NODES))
-                return resObj;
-            }));
 
+function fromSerializedToObject(arr) {
+    let res = {};
+    arr.forEach(({name, value}) => { res[name] = JSON.parse(value); });
+    return res;
+}
+function formEventToDataObject(ev, form) {
+    ev.preventDefault(); 
+    return fromSerializedToObject($(form).serializeArray());
+}
+
+const RANDOM_NODES = 10;
+let clickSource = 
+    Obs.merge(
+        ...["click", "submit"].map(ev => Obs.fromEvent($("#points-add"), ev) // WAAAT
+            .map(x => formEventToDataObject(x, "#sa-points"))
+            .map(({x, y}) => ({x, y:-y}))),
+        Obs.fromEvent($("#points-random"), "click")
+            .map(x => formEventToDataObject(x, "#sa-points"))
+            .map(({x, y}) => ({x, y}))
+            .flatMap(point => {
+                return Obs.from(randomWithMaxAbs(point.x, point.y, RANDOM_NODES))
+            })).share(); // sharing because of random "side-effect" ( should I share sources more frequently ? )
 
 let undoSource =
-    fromEvent(window, "keydown") 
-        .filter(e => (e.keyCode == 90 && e.ctrlKey))
+    Obs.merge(
+        Obs.fromEvent(window, "keydown") 
+            .filter(e => (e.keyCode === 90 && e.ctrlKey)),
+        Obs.fromEvent($("#points-undo"), "click")
+            .do(e => e.preventDefault())).share();
 
-let pointsSource = Rx.Observable.merge(
+let resetSource =
+    Obs.fromEvent($("#points-reset"), "click") 
+        .do(e => e.preventDefault()).share();
+
+let pointsSource = Obs.merge(
     clickSource.map(c => ({type:"click", point:c})),
-    undoSource.map(_e => ({type:"undo"}))
-    )
+    undoSource.map(_ => ({type:"undo"})),
+    resetSource.map(_ => ({type: "reset"})))
     .scan([], 
-        (acc, {type, point}) => 
-            (type == "click") ? acc.concat(point) : acc.slice(0, -1)
-        )
+        (acc, {type, point}) => {
+            let actions = {
+                click: ()=>acc.concat(point), 
+                undo: ()=>acc.slice(0,-1),
+                reset: ()=>[]
+            }
+            return actions[type]();
+        })
+
 pointsSource.subscribe(points => {
     Render.renderOnlyPoints(points, tempColorInterpolation(1).hex());
 })
@@ -96,14 +88,8 @@ function validateSaParams() {
     return true;
 }
 
-function fromSerializedToObject(arr) {
-    let res = {};
-    arr.forEach(({name, value}) => { res[name] = parseFloat(value); });
-    return res;
-}
-
 let [formSource, badFormSource] =
-    fromEvent($("#sa-params"), "submit")
+    Obs.fromEvent($("#sa-params"), "submit").share()
         .map(e => { e.preventDefault(); return fromSerializedToObject($(e.target).serializeArray()); })
         .partition(validateSaParams);
 
@@ -112,6 +98,16 @@ badFormSource.subscribe(_x=>console.log("BAD FORM BRO REPAIR IT"));
 let saParamsSource = formSource.withLatestFrom(above2PointsSource, (formData, points) => Object.assign({}, formData, {"points":points}));
 
 let saOutputSource = saParamsSource.flatMapLatest(getSimulatedData);
+
+
+let waitingDialog = require("./wait-dialog.js");
+
+let showWaitSource = saParamsSource;
+let hideWaitSource = saOutputSource;
+
+showWaitSource.subscribe(_x => waitingDialog.show("Loading", {dialogSize : "sm"}));
+hideWaitSource.subscribe(_x => waitingDialog.hide());
+
 
 function setupFader(value) {
     let fader = $("#sa-main-fader");
@@ -124,20 +120,18 @@ saOutputSource.subscribe(data => {
 });
 
 let faderSource =
-    fromEvent($("#sa-main-fader"), "input")
+    Obs.fromEvent($("#sa-main-fader"), "input")
         .throttleFirst(40)
         .map(e => $(e.target).val());
-
 
 let nowIterSource = saOutputSource.flatMapLatest(data => {
     return faderSource.startWith(0).map(index => { return {iter : data.iters[index], sol: data.sol} })
 });
 
-
 let temperatureDomainSource = new Rx.BehaviorSubject();
 saParamsSource.map(params => {return{max: params.temp_init, min:params.temp_min}}).subscribe(temperatureDomainSource);
 
-Rx.Observable.combineLatest(nowIterSource, saParamsSource,
+Obs.combineLatest(nowIterSource, saParamsSource,
     (data, params) => ({data, tempMax: params.temp_init, tempMin: params.temp_min, points: params.points}))
         .subscribe(({data, tempMin, tempMax, points}) => {
         let nowTemp = (data.iter.temp/(tempMax - tempMin));

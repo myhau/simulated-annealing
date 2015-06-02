@@ -4,6 +4,7 @@
   "dependencies": {
     "babel-runtime": "^5.4.7",
     "body-parser": "^1.12.4",
+    "bootstrap": "^3.3.4",
     "chroma": "0.0.1",
     "chroma-js": "^0.7.4",
     "d3": "^3.5.5",

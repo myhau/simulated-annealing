@@ -5,7 +5,7 @@
 <!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
     <head>
         <meta charset="utf-8">
-        <title>simulated annealing</title>
+        <title>Simulated annealing</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
         <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
@@ -15,8 +15,6 @@
         <!-- build:js scripts/vendor/modernizr.js -->
         <script src="bower_components/modernizr/modernizr.js"></script>
         <!-- endbuild -->
-
-        <script src="bower_components/sigma/sigma.min.js"> </script>
 
 
     </head>
@@ -100,8 +98,10 @@
                                 <label for="y">Y</label>
                                 <input type="number" step="0.0001" class="form-control input-sm" name="y" id="point_y" value="5">
                             </div>
-                            <button type="submit" class="btn btn-primary" id="points-random">Add 10 random</button>
                             <button type="submit" class="btn btn-primary" id="points-add">Add</button>
+                            <button type="submit" class="btn btn-primary" id="points-random">Rand 10</button>
+                            <button type="submit" class="btn btn-primary" id="points-reset">Reset</button>
+                            <button type="submit" class="btn btn-primary" id="points-undo">Undo</button>
                         </form>
 
                     </div>
@@ -129,13 +129,13 @@
                             <input type="number" step="0.00001" class="form-control input-sm" name="k" id="k" value="1">
                         </div>
                         <div class="form-group">
-                            <label for="iters_for_each_t">Each try iterations</label>
+                            <label for="iters_for_each_t">Iterations for fixed temperature</label>
                             <input type="number" min="1" step="1" class="form-control input-sm" name="iters_for_each_t" id="iters_for_each_t" value="200">
                         </div>
-                        <div class="form-group">
+                        <!-- <div class="form-group">
                             <label for="n_tries">Each try iterations</label>
                             <input type="number" min="1" step="1" class="form-control input-sm" name="n_tries" id="n_tries" value="200">
-                        </div>
+                        </div> -->
                         <button type="submit" class="btn btn-primary">Submit</button>
                     </form>
                 </div>
@@ -149,9 +149,6 @@
                         <input type=range min="0" max="100" value="0" id="sa-main-fader" />
                     </div>
                 </div>
-                <div class="col-xs-2">
-                    <button type="submit" class="btn btn-primary">Show best</button>
-                </div>
                 </form>
             </div>
 
@@ -164,10 +161,16 @@
 
         <!-- build:js scripts/vendor.js -->
         <!-- bower:js -->
-        <script src="bower_components/jquery/dist/jquery.js"></script>
+        
         <!-- endbower -->
         <!-- endbuild -->
+
+        <script src="bower_components/jquery/dist/jquery.js"></script>
+        <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+        <script src="bower_components/sigma/sigma.min.js"></script>
+
         <script src="scripts/app.js"></script>
+
         <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
         <script>
             (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
