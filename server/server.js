@@ -21,7 +21,7 @@ let execObs = function (command) {
             
             if(process) {
                 console.log("DISPOSED");
-                process.kill();
+                process.kill("SIGKILL");
             }
         }
     });

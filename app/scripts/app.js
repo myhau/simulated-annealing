@@ -21,7 +21,7 @@ function getSimulatedData(params) {
         crossDomain: true,
         method: "POST",
         accepts: "json"
-    }));
+    }).promise());
 }
 
 function* randomWithMaxAbs(x, y, count) {
@@ -48,10 +48,9 @@ let clickSource =
             .map(({x, y}) => ({x, y:-y}))),
         Obs.fromEvent($("#points-random"), "click")
             .map(x => formEventToDataObject(x, "#sa-points"))
-            .map(({x, y}) => ({x, y}))
             .flatMap(point => {
                 return Obs.from(randomWithMaxAbs(point.x, point.y, RANDOM_NODES))
-            })).share(); // sharing because of random "side-effect" ( should I share sources more frequently ? )
+            })).share(); // sharing because of Math.rand "side-effect" ( should I share sources more frequently ? )
 
 let undoSource =
     Obs.merge(
@@ -65,18 +64,18 @@ let resetSource =
         .do(e => e.preventDefault()).share();
 
 let pointsSource = Obs.merge(
-    clickSource.map(c => ({type:"click", point:c})),
-    undoSource.map(_ => ({type:"undo"})),
-    resetSource.map(_ => ({type: "reset"})))
+    clickSource.map(point => ({type: "click", point})),
+    undoSource.map(_e => ({type: "undo"})),
+    resetSource.map(_e => ({type: "reset"})))
     .scan([], 
         (acc, {type, point}) => {
             let actions = {
-                click: ()=>acc.concat(point), 
+                click: ()=>acc.concat(point),  // lazy
                 undo: ()=>acc.slice(0,-1),
                 reset: ()=>[]
             }
             return actions[type]();
-        })
+        });
 
 pointsSource.subscribe(points => {
     Render.renderOnlyPoints(points, tempColorInterpolation(1).hex());
@@ -89,25 +88,23 @@ function validateSaParams() {
 }
 
 let [formSource, badFormSource] =
-    Obs.fromEvent($("#sa-params"), "submit").share()
+    Obs.fromEvent($("#sa-params"), "submit")
         .map(e => { e.preventDefault(); return fromSerializedToObject($(e.target).serializeArray()); })
         .partition(validateSaParams);
 
 badFormSource.subscribe(_x=>console.log("BAD FORM BRO REPAIR IT"));
 
-let saParamsSource = formSource.withLatestFrom(above2PointsSource, (formData, points) => Object.assign({}, formData, {"points":points}));
+let saParamsSource = formSource.withLatestFrom(above2PointsSource, (formData, points) => Object.assign({}, formData, {"points": points}));
 
-let saOutputSource = saParamsSource.flatMapLatest(getSimulatedData);
-
+let saOutputSource = saParamsSource.flatMapLatest(getSimulatedData).share();
 
 let waitingDialog = require("./wait-dialog.js");
 
 let showWaitSource = saParamsSource;
-let hideWaitSource = saOutputSource;
+let hideWaitSource = Obs.merge(saOutputSource, badFormSource);
 
 showWaitSource.subscribe(_x => waitingDialog.show("Loading", {dialogSize : "sm"}));
 hideWaitSource.subscribe(_x => waitingDialog.hide());
-
 
 function setupFader(value) {
     let fader = $("#sa-main-fader");
@@ -129,7 +126,7 @@ let nowIterSource = saOutputSource.flatMapLatest(data => {
 });
 
 let temperatureDomainSource = new Rx.BehaviorSubject();
-saParamsSource.map(params => {return{max: params.temp_init, min:params.temp_min}}).subscribe(temperatureDomainSource);
+saParamsSource.map(params => {return{max: params.temp_init, min: params.temp_min}}).subscribe(temperatureDomainSource);
 
 Obs.combineLatest(nowIterSource, saParamsSource,
     (data, params) => ({data, tempMax: params.temp_init, tempMin: params.temp_min, points: params.points}))
