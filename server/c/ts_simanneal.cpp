@@ -68,7 +68,7 @@ void Ptsp(void *xp) {
 }
 
 double point_distance(point first, point second) {
-	return sqrt(pow(first.x, 2) + pow(second.y, 2));
+	return sqrt(pow(first.x - second.x, 2) + pow(first.y - second.y, 2));
 }
 
 void prepare_distance_matrix() {

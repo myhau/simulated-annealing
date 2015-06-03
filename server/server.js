@@ -10,15 +10,15 @@ app.use(bodyParser.json());
 
 let execObs = function (command) {
     return Rx.Observable.create(function (observer) {
-        let process = exec(command, (err, stdout, stderr) => {
+        let process = exec(command, { maxBuffer: 1024 * 50000 }, (err, stdout, stderr) => {
             if(err !== null) observer.onError(err);
             else {
                 observer.onNext([stdout, stderr]);
                 observer.onCompleted();
             }
-        }); 
+        });
         return function() {
-            
+
             if(process) {
                 console.log("DISPOSED");
                 process.kill("SIGKILL");
@@ -72,12 +72,15 @@ app.use(function(req, res, next) {
 
 app.post("/", (req, res) => {
     console.log("REQ!");
-    let sub = fromJsonData(req.body).subscribe(x => res.send(x), err=>res.sendStatus(400))
+    let sub = fromJsonData(req.body).subscribe(x => res.send(x), err=>{
+        console.log(`ERROR!: ${err}`);
+        res.sendStatus(400)
+    })
     req.on("close", function() {
         console.log("aSD");
         sub.dispose();
     });
-    
+
 })
 
 app.listen(8089)
