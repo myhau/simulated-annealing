@@ -11,6 +11,7 @@
         <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
 
         <link rel="stylesheet" href="styles/main.css">
+        <link rel="stylesheet" href="bower_components/metrics-graphics/dist/metricsgraphics.css">
 
         <!-- build:js scripts/vendor/modernizr.js -->
         <script src="bower_components/modernizr/modernizr.js"></script>
@@ -112,7 +113,27 @@
                     </div>
             	</div>
                 <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-                    <div style="width:550px; height:650px" id="graph-container"></div>
+                    <div role="tabpanel">
+
+                        <!-- Nav tabs -->
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li role="presentation" class="active"><a href="#graph1" role="tab" data-toggle="tab">Salesman graph</a></li>
+                            <li role="presentation"><a href="#charts1" role="tab" data-toggle="tab">Temperature/Energy charts</a></li>
+                        </ul>
+
+                        <!-- Tab panes -->
+                        <div class="tab-content">
+                            <div role="tabpanel" class="tab-pane active" id="graph1">
+                                <div style="width:550px; height:650px" id="graph-container"></div>
+                            </div>
+                            <div role="tabpanel" class="tab-pane" id="charts1">
+                                <div id="tempChart"> </div>
+                                <div id="energyChart"> </div>
+                            </div>
+                        </div>
+
+                    </div>
+
                 </div>
                 <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
                     <h3>Parameters</h3>
@@ -162,13 +183,18 @@
 
         <!-- build:js scripts/vendor.js -->
         <!-- bower:js -->
+         <script src="bower_components/jquery/dist/jquery.js"></script>
+        <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+        <script src="bower_components/sigma/sigma.min.js"></script>
 
         <!-- endbower -->
         <!-- endbuild -->
 
-        <script src="bower_components/jquery/dist/jquery.js"></script>
-        <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
-        <script src="bower_components/sigma/sigma.min.js"></script>
+        <script src="bower_components/d3/d3.js"></script>
+        <script src="bower_components/metrics-graphics/dist/metricsgraphics.js"></script>
+
+
+
 
         <script src="scripts/app.js"></script>
 

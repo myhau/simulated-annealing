@@ -45,7 +45,7 @@ function formEventToDataObject(ev, form) {
 const RANDOM_NODES = 10;
 let clickSource =
     Obs.merge(
-        ...["click", "submit"].map(ev => Obs.fromEvent($("#points-add"), ev) // WAAAT
+        ...["click", "submit"].map(ev => Obs.fromEvent($("#points-add"), ev)
             .map(x => formEventToDataObject(x, "#sa-points"))
             .map(({x, y}) => ({x, y:-y}))),
         Obs.fromEvent($("#points-random"), "click")
@@ -53,7 +53,7 @@ let clickSource =
             .flatMap(point => {
                 return Obs.from(randomWithMaxAbs(point.x, point.y, RANDOM_NODES))
     }))
-    .share(); // sharing because of Math.rand "side-effect" ( should I share sources more frequently ? )
+    .share();
 
 let undoSource =
     Obs.merge(
@@ -73,7 +73,7 @@ let pointsSource = Obs.merge(
     .scan([],
         (acc, {type, point}) => {
             let actions = {
-                click: ()=>acc.concat(point),  // lazy
+                click: ()=>acc.concat(point),
                 undo: ()=>acc.slice(0,-1),
                 reset: ()=>[]
             }
@@ -161,6 +161,39 @@ let faderSource =
     Obs.fromEvent($("#sa-main-fader"), "input")
         .throttleFirst(40)
         .map(e => $(e.target).val());
+
+saOutputSource.subscribe(data => {
+    const MAX_POINTS = 700;
+    let len = data.iters.length;
+    let everyPoint = Math.ceil(len / MAX_POINTS);
+    let sparseData = data.iters.filter((_el, i) => i % everyPoint === 0)
+    let sharedOptions = {
+        x_label: "Iteration",
+        x_accessor: "iter",
+        data: sparseData,
+        width: 450,
+        height: 330,
+        right: 40,
+        left: 80,
+        bottom: 80,
+        area: false,
+        linked: true,
+        animate_on_load: false,
+        transition_on_update: false
+    };
+    MG.data_graphic(Object.assign({}, sharedOptions, {
+            // title: "Temperature",
+            target: "#tempChart",
+            y_label: "Temperature",
+            y_accessor: "temp",
+    }));
+    MG.data_graphic(Object.assign({}, sharedOptions, {
+            // title: "Energy",
+            target: "#energyChart",
+            y_label: "Energy",
+            y_accessor: "energy"
+    }));
+});
 
 let nowIterSource = saOutputSource.flatMapLatest(data => {
     return faderSource.startWith(0).map(index => { return {iter : data.iters[index], sol: data.sol} })
