@@ -31,13 +31,11 @@
         </div>
         <div class="container-fluid">
             <div class="header">
-                <h3 class="text-muted">Simulated annealing</h3>
-
+                <h3>Simulated annealing - traveling salesman</h3>
             </div>
 
             <div class="row">
             	<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
-                    <h3>Outputs</h3>
                     <div id="sa-data">
                         <table class="table table-bordered table-striped">
                             <colgroup>
@@ -95,21 +93,6 @@
                             </tr>
                             </tbody>
                         </table>
-                        <form id="sa-points">
-                            <div class="form-group">
-                                <label for="x">X</label>
-                                <input type="number" step="0.0001" class="form-control input-sm" name="x" id="point_x" value="5">
-                            </div>
-                            <div class="form-group">
-                                <label for="y">Y</label>
-                                <input type="number" step="0.0001" class="form-control input-sm" name="y" id="point_y" value="5">
-                            </div>
-                            <button type="submit" class="btn btn-primary" id="points-add">Add</button>
-                            <button type="submit" class="btn btn-primary" id="points-random">Rand 10</button>
-                            <button type="submit" class="btn btn-primary" id="points-reset">Reset</button>
-                            <button type="submit" class="btn btn-primary" id="points-undo">Undo</button>
-                        </form>
-
                     </div>
             	</div>
                 <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
@@ -124,7 +107,7 @@
                         <!-- Tab panes -->
                         <div class="tab-content">
                             <div role="tabpanel" class="tab-pane active" id="graph1">
-                                <div style="width:550px; height:650px" id="graph-container"></div>
+                                <div style="width:600px; height:400px" id="graph-container"></div>
                             </div>
                             <div role="tabpanel" class="tab-pane" id="charts1">
                                 <div id="tempChart"> </div>
@@ -136,41 +119,69 @@
 
                 </div>
                 <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
-                    <h3>Parameters</h3>
-                    <form id="sa-params">
-                        <div class="form-group">
-                            <label for="temp_init">Initial temperature</label>
-                            <input type="number" step="0.00001" class="form-control input-sm" name="temp_init" id="temp_init" value="1000">
+                 <div role="tabpanel">
+
+                        <!-- Nav tabs -->
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li role="presentation" class="active"><a href="#points1" role="tab" data-toggle="tab">Points</a></li>
+                            <li role="presentation"><a href="#params1" role="tab" data-toggle="tab">Parameters</a></li>
+                        </ul>
+
+                        <!-- Tab panes -->
+                        <div class="tab-content">
+                            <div role="tabpanel" class="tab-pane" id="params1">
+                                <form id="sa-params">
+                                    <div class="form-group">
+                                        <label for="temp_init">Initial temperature</label>
+                                        <input type="number" step="0.00001" class="form-control input-sm" name="temp_init" id="temp_init" value="1000">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="temp_min">Minimal temperature</label>
+                                        <input type="number" step="0.00001" class="form-control input-sm" name="temp_min" id="temp_min" value="0.001">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="damp_factor">Damp factor</label>
+                                        <input type="number" step="0.00001" class="form-control input-sm" name="damp_factor" id="damp_factor" value="1.02">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="k">Boltzman constant k</label>
+                                        <input type="number" step="0.00001" class="form-control input-sm" name="k" id="k" value="1">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="iters_for_each_t">Iterations for fixed temperature</label>
+                                        <input type="number" min="1" step="1" class="form-control input-sm" name="iters_for_each_t" id="iters_for_each_t" value="200">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                </form>
+                            </div>
+                            <div role="tabpanel" class="tab-pane active" id="points1">
+                                 <form id="sa-points">
+                                    <div class="form-group">
+                                        <label for="x">X</label>
+                                        <input type="number" step="0.0001" class="form-control input-sm" name="x" id="point_x" value="5">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="y">Y</label>
+                                        <input type="number" step="0.0001" class="form-control input-sm" name="y" id="point_y" value="5">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary" id="points-add">Add</button>
+                                    <button type="submit" class="btn btn-primary" id="points-random">Rand 10</button>
+                                    <button type="submit" class="btn btn-primary" id="points-reset">Reset</button>
+                                    <button type="submit" class="btn btn-primary" id="points-undo">Undo</button>
+                                </form>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="temp_min">Minimal temperature</label>
-                            <input type="number" step="0.00001" class="form-control input-sm" name="temp_min" id="temp_min" value="0.001">
-                        </div>
-                        <div class="form-group">
-                            <label for="damp_factor">Damp factor</label>
-                            <input type="number" step="0.00001" class="form-control input-sm" name="damp_factor" id="damp_factor" value="1.02">
-                        </div>
-                        <div class="form-group">
-                            <label for="k">Boltzman constant k</label>
-                            <input type="number" step="0.00001" class="form-control input-sm" name="k" id="k" value="1">
-                        </div>
-                        <div class="form-group">
-                            <label for="iters_for_each_t">Iterations for fixed temperature</label>
-                            <input type="number" min="1" step="1" class="form-control input-sm" name="iters_for_each_t" id="iters_for_each_t" value="200">
-                        </div>
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                    </form>
+
+                    </div>
                 </div>
             </div>
 
             <div class="row">
                 <form id="sa-main-fader-form">
-                <div class="col-xs-10">
                     <div class="form-group">
                         <label for="sa-main-fader">Time machine:</label>
                         <input type=range min="0" max="100" value="0" id="sa-main-fader" />
                     </div>
-                </div>
                 </form>
             </div>
 

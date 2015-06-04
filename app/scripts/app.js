@@ -163,7 +163,7 @@ let faderSource =
         .map(e => $(e.target).val());
 
 saOutputSource.subscribe(data => {
-    const MAX_POINTS = 700;
+    const MAX_POINTS = 1000;
     let len = data.iters.length;
     let everyPoint = Math.ceil(len / MAX_POINTS);
     let sparseData = data.iters.filter((_el, i) => i % everyPoint === 0)
@@ -172,7 +172,7 @@ saOutputSource.subscribe(data => {
         x_accessor: "iter",
         data: sparseData,
         width: 450,
-        height: 330,
+        height: 300,
         right: 40,
         left: 80,
         bottom: 80,
