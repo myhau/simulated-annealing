@@ -17,8 +17,6 @@ double Etsp(void *xp) {
 	unsigned int i;
 
 	for (i = 0; i < n_points; ++i) {
-		/* use the distance_matrix to optimize this calculation; it had
-		 better be allocated!! */
 		E += distance_matrix[route[i]][route[(i + 1) % n_points]];
 	}
 
