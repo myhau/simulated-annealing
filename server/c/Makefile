@@ -1,11 +1,11 @@
 CC=g++
-INCL=-I. -I/usr/local/include/ 
+INCL=-I. -I/usr/local/include/
 COMMA=,
 LIB_DIRS=. /usr/local/lib/
 LIBS=$(patsubst %,-L%,$(LIB_DIRS)) -lgsl -lgslcblas -lm $(OPTLIBS) $(patsubst %, -Wl$(COMMA)-rpath=%, $(LIB_DIRS))
-CFLAGS=-g -O2 -Wall -Wextra $(INCL) -DNDEBUG $(OPTFLAGS) -std=c++14
+CFLAGS=-g -O2 -Wall -Wextra $(INCL) -DNDEBUG $(OPTFLAGS) -std=c++11
 
-SOURCES=$(wildcard *.cpp) 
+SOURCES=$(wildcard *.cpp)
 OBJECTS=$(patsubst %.cpp,%.o,$(SOURCES))
 
 TARGET=main
@@ -13,17 +13,17 @@ TARGET=main
 all: $(TARGET)
 
 
-dev: CFLAGS=-g -Wall $(INCL) -Wextra $(OPTFLAGS) 
+dev: CFLAGS=-g -Wall $(INCL) -Wextra $(OPTFLAGS)
 dev: all
 
 %.o: %.cpp
-	$(CC) -o $@ -c $< $(CFLAGS) $(INCL)  
+	$(CC) -o $@ -c $< $(CFLAGS) $(INCL)
 
 $(TARGET): $(OBJECTS)
 	$(CC) -o $@ $(OBJECTS) $(CFLAGS) $(LIBS)
-	
+
 .PHONY: clean
 
-clean: 
+clean:
 	rm -rf $(OBJECTS) $(TARGET) $(SO_TARGET)
 

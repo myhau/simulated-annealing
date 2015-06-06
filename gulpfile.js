@@ -24,12 +24,11 @@ var reload = browserSync.reload;
 gulp.task('styles', ['sass'  ]);
 
 gulp.task('sass', function() {
-    return gulp.src(['app/styles/**/*.scss', 'app/styles/**/*.css'])
-        .pipe($.rubySass({
+    return $.rubySass('./app/styles', {
             style: 'expanded',
             precision: 10,
             loadPath: ['app/bower_components']
-        }))
+        })
         .pipe($.autoprefixer('last 1 version'))
         .pipe(gulp.dest('dist/styles'))
         .pipe($.size());
@@ -122,22 +121,25 @@ gulp.task('fonts', function() {
 // Clean
 gulp.task('clean', function(cb) {
     $.cache.clearAll();
-    cb(del.sync(['dist/styles', 'dist/scripts', 'dist/images']));
+    del.sync(['dist/styles', 'dist/scripts', 'dist/images']);
+    cb();
 });
 
 // Bundle
 gulp.task('bundle', ['styles', 'scripts', 'bower'], function() {
+    var assets = $.useref.assets();
     return gulp.src('./app/*.html')
-        .pipe($.useref.assets())
-        .pipe($.useref.restore())
+        .pipe(assets)
+        .pipe(assets.restore())
         .pipe($.useref())
         .pipe(gulp.dest('dist'));
 });
 
 gulp.task('buildBundle', ['styles', 'buildScripts', 'bower'], function() {
+    var assets = $.useref.assets();
     return gulp.src('./app/*.html')
-        .pipe($.useref.assets())
-        .pipe($.useref.restore())
+        .pipe(assets)
+        .pipe(assets.restore())
         .pipe($.useref())
         .pipe(gulp.dest('dist'));
 });

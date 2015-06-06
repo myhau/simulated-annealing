@@ -1,0 +1,28 @@
+language: node_js
+node_js:
+- '0.12'
+env:
+  global:
+  - PATH=$PATH:./node_modules/.bin
+  - DEPLOY_SERVER=root@46.101.30.20
+addons:
+  ssh_known_hosts: root@46.101.30.20
+before_install:
+
+- sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+- sudo apt-get update -qq
+- sudo apt-get install -qq g++-4.8 libgsl0ldbl libgsl0-dev
+- gem install sass
+before_script:
+- bower install
+script:
+- make CC=g++-4.8 -C server/c
+- babel server/server.js > /dev/null 2>&1
+- gulp
+after_success:
+- openssl aes-256-cbc -K $encrypted_9ec0b4b520d5_key -iv $encrypted_9ec0b4b520d5_iv -in to_deploy.enc -out to_deploy -d
+- chmod 600 to_deploy
+- eval "$(ssh-agent -s)"
+- ssh-add to_deploy
+- git remote add deploy ssh://$DEPLOY_SERVER/repos/siman-deploy
+- yes | git push deploy master
