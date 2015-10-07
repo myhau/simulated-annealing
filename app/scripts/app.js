@@ -15,14 +15,13 @@ const UPPER_ITERATIONS_LIMIT = 100 * Math.pow(10,6);
 const tempColorInterpolation = chroma.scale(["#21AB6C","#60A744","#8E9E1D","#B99106","#DE7E24","#F9684A"]);
 
 function getSimulatedData(params) {
-  return Observable.fromPromise($.ajax({
-    url: serverName,
-    data: JSON.stringify(params),
-    contentType: "application/json",
-    crossDomain: true,
-    method: "POST",
-    accepts: "json",
-  }));
+  let wrkr = new Worker('worker.js')
+  return Promise(function(res, rej) {
+    wrkr.onmessage = (e) => {
+      res(e.data)
+    }
+    wrkr.postMessage('start')
+  })
 }
 
 function* range(first, last, interval = 1) {
@@ -131,6 +130,9 @@ const saParamsSource =
     above2PointsSource,
     (formData, points) => Object.assign({}, formData, {"points": points})
   );
+
+
+saParamsSource.subscribe((data) => console.log(data))
 
 const [saOutputSource, saComputationErrorSource] =
   saParamsSource
