@@ -63,7 +63,7 @@ function parseAndRun(data) {
         || shouldAcceptNew(best, nextSol, data.points, costFunction, tempNow, data.k)) best = nextSol
 
       if(costFunction(data.points, bestbest) > costFunction(data.points, best)) bestbest = best
-        
+
     }
     bestHistory.push({ energy: costFunction(data.points, best), pos: best.slice(), iter, temp: tempNow, evals: iter * data['iters_for_each_t']})
     iter++
@@ -80,7 +80,5 @@ function parseAndRun(data) {
 
 onmessage = (e) => {
   let res = parseAndRun(e.data)
-  console.log(e.data)
-  console.log(res)
   postMessage(res)
 }
