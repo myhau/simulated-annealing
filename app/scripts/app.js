@@ -10,17 +10,17 @@ const Render = require("./render.js");
 
 const serverName = `http://${location.hostname}:8089/`;
 
-const UPPER_ITERATIONS_LIMIT = 100 * Math.pow(10,6);
+const UPPER_ITERATIONS_LIMIT = 100 * Math.pow(10,6);//
 
 const tempColorInterpolation = chroma.scale(["#21AB6C","#60A744","#8E9E1D","#B99106","#DE7E24","#F9684A"]);
 
 function getSimulatedData(params) {
-  let wrkr = new Worker('worker.js')
-  return Promise(function(res, rej) {
+  let wrkr = new Worker("scripts/workers/worker.js")
+  return new Promise(function(res, rej) {
     wrkr.onmessage = (e) => {
       res(e.data)
     }
-    wrkr.postMessage('start')
+    wrkr.postMessage(params)
   })
 }
 
