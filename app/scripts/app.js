@@ -117,9 +117,12 @@ function validateSaParams(params) {
 }
 
 const [formSource, badFormSource] =
-  Observable.fromEvent($("#sa-params"), "submit")
+  Observable.merge(
+    Observable.fromEvent($("#sa-params"), "submit"),
+    Observable.fromEvent($("#sa-points #compute2"), "click")
+  )
     .map(e =>
-      (e.preventDefault(), fromSerializedToObject($(e.target).serializeArray()))
+      (e.preventDefault(), fromSerializedToObject($("#sa-params").serializeArray()))
     )
     .partition(validateSaParams);
 
